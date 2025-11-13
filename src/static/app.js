@@ -27,6 +27,39 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
         `;
 
+        // Participants section
+        const participantsSection = document.createElement("div");
+        participantsSection.className = "participants";
+
+        const participantsTitle = document.createElement("h5");
+        participantsTitle.textContent = "Participants";
+        participantsSection.appendChild(participantsTitle);
+
+        const ul = document.createElement("ul");
+        ul.className = "participants-list";
+
+        if (Array.isArray(details.participants) && details.participants.length > 0) {
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            li.className = "participant";
+            // if participant is an object with name, show name, otherwise show raw value
+            if (p && typeof p === "object" && (p.name || p.email)) {
+              li.textContent = p.name || p.email;
+            } else {
+              li.textContent = String(p);
+            }
+            ul.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.className = "no-participants";
+          li.textContent = "No participants yet";
+          ul.appendChild(li);
+        }
+
+        participantsSection.appendChild(ul);
+        activityCard.appendChild(participantsSection);
+
         activitiesList.appendChild(activityCard);
 
         // Add option to select dropdown
@@ -62,6 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // refresh list to show new participant
+        activitySelect.innerHTML = `<option value="">-- Select an activity --</option>`;
+        activitiesList.innerHTML = `<p>Loading activities...</p>`;
+        fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
